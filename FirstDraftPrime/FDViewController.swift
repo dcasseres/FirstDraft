@@ -33,33 +33,33 @@ class FDViewController: NSViewController, NSTextViewDelegate {
             // Update the view, if already loaded.
         }
     }
+}
     
     //        func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRanges oldSelectedCharRanges: [NSValue], toCharacterRanges newSelectedCharRanges: [NSValue]) -> [NSValue]{
     //        return newSelectedCharRanges
     //    }
     //
-    func textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange, toCharacterRange newSelectedCharRange: NSRange) -> NSRange {
-        let txView = textView as! FDTextView
-        switch txView.currentState{
-        case .waitingForSelection1:
-            switch txView.currentVerb {
-            case .delete:
-                txView.cmdLine.stringValue = "RETURN to execute"
-                txView.currentState = .waitingForCommandAccept
-                let newRange = txView.textStorage!.doubleClick(at: oldSelectedCharRange.location)
-                return newRange
-            default: //not delete
-                
-                return newSelectedCharRange
-            }
-            
-        default: //not waitingForSelection1
-            return newSelectedCharRange
-        }
-        
-    }
+    //    func  -> NSRange textView(_ textView: NSTextView, willChangeSelectionFromCharacterRange oldSelectedCharRange: NSRange, toCharacterRange newSelectedCharRange: NSRange){
+    //        let txView = textView as! FDTextView
+    //        switch txView.currentState{
+    //        case .waitingForSelection1:
+    //            switch txView.currentVerb {
+    //            case .delete:
+    //                txView.cmdLine.stringValue = "RETURN to execute"
+    //                txView.currentState = .waitingForCommandAccept
+    //                let newRange = txView.textStorage!.doubleClick(at: oldSelectedCharRange.location)
+    //                return newRange
+    //            default: //not delete
+    //
+    //                return newSelectedCharRange
+    //            }
+    //
+    //        default: //not waitingForSelection1
+    //            return newSelectedCharRange
+    //        }
+    //
+    //    }
     
-}
 
 //Implement keystrokes that drive the mode state machine]
 //func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange, replacementString: String?) -> Bool      {

@@ -105,16 +105,16 @@
                     switch self.currentState {
                     case .waitingForCommand1:
                         switch event.charactersIgnoringModifiers!.first!{
-                        case "\n","\r":
-                            switch currentVerb {
-                            case .delete:
-                                self.cut(self)
-                                currentState = .waitingForCommand1
-                                currentVerb = commandVerb.noVerb
-                                currentNoun = commandNoun.noNoun
-                            default:
-                                return
-                            }
+//                        case "\n","\r": //eol => cmd-delete or bksp
+//                            switch currentVerb {
+//                            case .delete:
+//                                self.cut(self)
+//                                currentState = .waitingForCommand1
+//                                currentVerb = commandVerb.noVerb
+//                                currentNoun = commandNoun.noNoun
+//                            default:
+//                                return
+//                            }
                         case "a","A":
                             //drive state
                             currentVerb = commandVerb.append
@@ -139,7 +139,7 @@
                             super.keyUp(with: event)
                         }
                         
-                    case .waitingForCommand2:
+                    case .waitingForCommand2:      
                         switch event.charactersIgnoringModifiers!.first!{
                         case "t","T":
                             //drive state
@@ -169,7 +169,26 @@
                         default:
                             super.keyUp(with: event)
                         }
+                        
+                    case .waitingForCommandAccept:
+                        switch event.charactersIgnoringModifiers!.first!{
+                        case "\r","\n":
+                            
+                        switch currentVerb {
+                        case .delete:
+                            self.cut(nil)
+                        default:
+                            super.keyUp(with: event)
+      }
+                        
                     default:
+                        super.keyUp(with: event)
+                    }
+                    case .modeless:
+                        super.keyUp(with: event)
+                    case .waitingForSelection1:
+                        super.keyUp(with: event)
+                    case .waitingForSelection2:
                         super.keyUp(with: event)
                     }
                     

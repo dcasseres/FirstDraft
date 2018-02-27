@@ -219,18 +219,18 @@ class FDViewController: NSViewController, NSTextViewDelegate {
 //        }
 //    }
 //
-func processEOL(view:FDTextView) -> Bool {
-    switch view.currentVerb {
-    case .delete:
-        view.cut(view)
-        view.currentState = .waitingForCommand1
-        view.currentVerb = .noVerb
-        view.currentNoun = .noNoun
-        return false
-    default:
-        return true
-        
-    }
-}
+//func processEOL(view:FDTextView) -> Bool {
+//    switch view.currentVerb {
+//    case .delete:
+//        view.cut(view)
+//        view.currentState = .waitingForCommand1
+//        view.currentVerb = .noVerb
+//        view.currentNoun = .noNoun
+//        return false
+//    default:
+//        return true
+//        
+//    }
+//}
 
  

@@ -1,4 +1,4 @@
-            //
+             //
             //  FDTextView.swift
             //  FIrstDraft
             //
@@ -64,29 +64,67 @@
                     currentNoun = .noNoun
                 }
             }
-            
+           			
             extension FDTextView {
                 
                 
                 //    override func setSelectedRange(_ charRange: NSRange, affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool)
                 //    {
                 //        switch self.currentState{
-                //        case .waitingForSelection1:
-                //            switch currentVerb {
-                //            case .delete:
-                //                cmdLine.stringValue = "RETURN to execute"
-                //                currentState = .waitingForCommandAccept
-                //                super.setSelectedRange(textStorage!.doubleClick(at: charRange.location),affinity: affinity,stillSelecting: false)
-                //                print(self.selectedRange())
-                //
+                //        w
                 //            default:
                 //                super.setSelectedRange(charRange,affinity: affinity,stillSelecting: stillSelectingFlag)
                 //            }
                 //
                 //        default:
-                //            super.setSelectedRange(charRange,affinity: affinity,stillSelecting: stillSelectingFlag)
+                //            super.setSelectedRange(charRange,affinity: affinity,stillSelecting: z)
                 //        }.c
                 //    }
+                override func mouseDown(with event: NSEvent) {
+                    switch self.currentState {
+                    case .waitingForCommand1,
+                         .waitingForCommand2,
+                         .waitingForSelection1,
+                         .waitingForSelection2,
+                         .waitingForCommandAccept:
+                        return
+                    default:
+                        super.mouseDown(with: event)
+                    }
+                }
+                
+                override func mouseUp(with event: NSEvent) {
+                    switch self.currentState {
+                    case .waitingForSelection1:
+                        switch self.currentVerb {
+                        case .delete:
+                            switch self.currentNoun {
+                            case .word:
+                                print(self.selectedRange())
+                                self.setSelectedRange(textStorage!.doubleClick(at: self.selectedRange().location))
+                                print(self.selectedRange())
+                                self.currentState = machineState.waitingForCommandAccept
+                            default:
+                                super.mouseUp(with: event)
+                            }
+                        default:
+                            super.mouseUp(with: event)
+                        }
+                    case .waitingForCommandAccept:
+                            switch self.currentVerb {
+                        case .delete:
+                            self.cut(nil)
+                            self.currentState = machineState.modeless
+                            self.currentVerb = commandVerb.noVerb
+                            self.currentNoun = commandNoun.noNoun
+                            cmdLine.stringValue = "Begin modelesss editing"
+                        default:
+                            super.mouseUp(with: event)
+                        }
+                    default:
+                        super.mouseUp(with: event)
+                    }
+                }
                 
                 override func keyDown(with event: NSEvent){
                     switch self.currentState {
@@ -105,17 +143,7 @@
                     switch self.currentState {
                     case .waitingForCommand1:
                         switch event.charactersIgnoringModifiers!.first!{
-//                        case "\n","\r": //eol => cmd-delete or bksp
-//                            switch currentVerb {
-//                            case .delete:
-//                                self.cut(self)
-//                                currentState = .waitingForCommand1
-//                                currentVerb = commandVerb.noVerb
-//                                currentNoun = commandNoun.noNoun
-//                            default:
-//                                return
-//                            }
-                        case "a","A":
+                           case "a","A":
                             //drive state
                             currentVerb = commandVerb.append
                             currentState = machineState.waitingForCommand2
@@ -169,28 +197,34 @@
                         default:
                             super.keyUp(with: event)
                         }
-                        
-                    case .waitingForCommandAccept:
-                        switch event.charactersIgnoringModifiers!.first!{
-                        case "\r","\n":
-                            
-                        switch currentVerb {
-                        case .delete:
-                            self.cut(nil)
-                        default:
-                            super.keyUp(with: event)
-      }
-                        
                     default:
                         super.keyUp(with: event)
                     }
-                    case .modeless:
-                        super.keyUp(with: event)
-                    case .waitingForSelection1:
-                        super.keyUp(with: event)
-                    case .waitingForSelection2:
-                        super.keyUp(with: event)
-                    }
+//                    case .waitingForCommandAccept:
+//                        switch event.charactersIgnoringModifiers!.first!{
+//                        case "\r","\n":
+//
+//                            switch currentVerb {
+//                            case .delete:
+//                                self.cut(nil)
+//                                self.currentState = machineState.modeless
+//                                self.currentVerb = commandVerb.noVerb
+//                                self.currentNoun = commandNoun.noNoun
+//                                cmdLine.stringValue = "Begin modelesss editing"
+//                            default:
+//                                super.keyUp(with: event)
+//                            }
+//
+//                        default:
+//                            super.keyUp(with: event)
+//                        }
+//                    case .modeless:
+//                        super.keyUp(with: event)
+//                    case .waitingForSelection1:
+//                        super.keyUp(with: event)
+//                    case .waitingForSelection2:
+//                        super.keyUp(with: event)
+//                    }
                     
                     
                     //                //Implement keystrokes that drive the mode state machine]

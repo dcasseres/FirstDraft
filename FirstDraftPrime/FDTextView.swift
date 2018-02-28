@@ -100,9 +100,12 @@
                         case .delete:
                             switch self.currentNoun {
                             case .word:
+                                textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
                                 print(self.selectedRange())
+                                /*hack!!!*/
                                 self.setSelectedRange(textStorage!.doubleClick(at: self.selectedRange().location))
                                 print(self.selectedRange())
+                                textStorage!.addAttribute(NSAttributedStringKey.backgroundColor, value: NSColor.selectedTextColor, range: self.selectedRange())
                                 self.currentState = machineState.waitingForCommandAccept
                             default:
                                 super.mouseUp(with: event)

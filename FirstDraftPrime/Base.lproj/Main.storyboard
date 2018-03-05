@@ -704,6 +704,7 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
+                <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController id="XfG-lQ-9wD" customClass="FDViewController" customModule="FirstDraftPrime" customModuleProvider="target" sceneMemberID="viewController">
                     <customView key="view" id="VVZ-B0-1r8">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
@@ -725,7 +726,7 @@
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <connections>
                                                 <outlet property="cmdLine" destination="U9g-uq-LL6" id="3Dy-zW-hvs"/>
-                                                <outlet property="modalEditing" destination="PBS-Df-Rnh" id="oXW-xg-XZZ"/>
+                                                <outlet property="delegate" destination="XfG-lQ-9wD" id="Asd-JM-7jX"/>
                                             </connections>
                                         </textView>
                                     </subviews>
@@ -740,32 +741,34 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PBS-Df-Rnh">
-                                <rect key="frame" x="382" y="275" width="64" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Modal" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Er0-11-BvX">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="modalActionWithSender:" target="CKV-KC-SXd" id="s1n-zK-O5y"/>
-                                </connections>
-                            </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U9g-uq-LL6">
                                 <rect key="frame" x="6" y="279" width="308" height="17"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Begin modeless editing" id="cOl-5O-w28">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="Begin modeless editing" id="cOl-5O-w28">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Io5-HA-XIC">
+                                <rect key="frame" x="375" y="270" width="81" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ypq-Zs-Fbq">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="modalActionWithSender:" target="CKV-KC-SXd" id="Zr8-cf-QWY"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="U9g-uq-LL6" secondAttribute="trailing" constant="139" id="JPY-38-e39"/>
                         </constraints>
                     </customView>
+                    <connections>
+                        <outlet property="textView" destination="CKV-KC-SXd" id="PX7-pJ-Zh0"/>
+                    </connections>
                 </viewController>
-                <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="655"/>
         </scene>

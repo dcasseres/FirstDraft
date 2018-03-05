@@ -1,4 +1,4 @@
-             //
+//
             //  FDTextView.swift
             //  FIrstDraft
             //
@@ -9,13 +9,6 @@
             import AppKit
             
             class FDTextView: NSTextView {
-                
-                //    required init?(coder: NSCoder) {
-                //        class CKTextView: NSTextView {
-                
-                //    required init?(coder: NSCoder) {
-                //        <#code#>
-                //    }
                 
                 enum machineState {
                     case modeless
@@ -44,6 +37,7 @@
                 }
                 
                 var currentState = machineState.modeless
+                
                 var currentVerb: commandVerb = commandVerb.noVerb
                 var currentNoun: commandNoun = commandNoun.noNoun
                 
@@ -52,8 +46,8 @@
                 @IBOutlet weak var modalEditing:NSButton!
                 
                 @IBAction func modalAction(sender:NSButton){
-                    switch sender.intValue {
-                    case 1:
+                    switch currentState {
+                    case machineState.modeless:
                         currentState = .waitingForCommand1
                         cmdLine.stringValue  = "Begin modal editing"
                     default:
@@ -64,11 +58,28 @@
                     currentNoun = .noNoun
                 }
             }
-             
-             extension FDTextView {
+               
+            extension FDTextView {
                 
+                func setCurrentState (_ newState: machineState) {
+                    if currentState == machineState.modeless && newState != machineState.modeless {
+                        cmdLine.stringValue  = "Begin NLS-style editing"
+                    }
+                     if currentState != machineState.modeless && newState == machineState.modeless {
+                        cmdLine.stringValue  = "Begin Mac-style editing"
+                    }
                 
-                //    override func setSelectedRange(_ charRange: NSRange, affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool)
+                    currentState = newState
+                }
+                
+
+                func convertPointFromWindow(_ pt: NSPoint) -> NSPoint {
+                    let fakeRect = NSMakeRect(pt.x, pt.y, 1, 1)
+                    let convertedRect = self.convert(fakeRect, from: nil)
+                    return NSMakePoint(convertedRect.origin.x, convertedRect.origin.y)
+                }
+
+                                //    override func setSelectedRange(_ charRange: NSRange, affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool)
                 //    {
                 //        switch self.currentState{
                 //        w
@@ -101,12 +112,18 @@
                             switch self.currentNoun {
                             case .word:
                                 textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
+                                
                                 print(self.selectedRange())
-                                /*hack!!!*/
-                                self.setSelectedRange(textStorage!.doubleClick(at: self.selectedRange().location))
+                                let pointInView = self.convertPointFromWindow(event.locationInWindow)
+                                let clicked = self.characterIndexForInsertion(at: pointInView)
+                                let myRange = self.textStorage!.doubleClick(at: clicked)
+                                self.setSelectedRange(myRange)
                                 print(self.selectedRange())
-                                textStorage!.addAttribute(NSAttributedStringKey.backgroundColor, value: NSColor.selectedTextColor, range: self.selectedRange())
-                                self.currentState = machineState.waitingForCommandAccept
+                                
+                                textStorage!.addAttribute(NSAttributedStringKey.backgroundColor, value:
+                                    NSColor.selectedTextColor, range: self.selectedRange())
+                                self.setCurrentState(machineState.waitingForCommandAccept)
+                                cmdLine.stringValue = "Click anywhere to finish deletion"
                             default:
                                 super.mouseUp(with: event)
                             }
@@ -114,10 +131,10 @@
                             super.mouseUp(with: event)
                         }
                     case .waitingForCommandAccept:
-                            switch self.currentVerb {
+                        switch self.currentVerb {
                         case .delete:
                             self.cut(nil)
-                            self.currentState = machineState.modeless
+                            self.setCurrentState(machineState.modeless)
                             self.currentVerb = commandVerb.noVerb
                             self.currentNoun = commandNoun.noNoun
                             cmdLine.stringValue = "Begin modelesss editing"
@@ -149,22 +166,22 @@
                            case "a","A":
                             //drive state
                             currentVerb = commandVerb.append
-                            currentState = machineState.waitingForCommand2
+                            setCurrentState(machineState.waitingForCommand2)
                             cmdLine.stringValue = commandVerb.append.rawValue
                         case "i","I":
                             //drive state
                             currentVerb = commandVerb.insert
-                            currentState = machineState.waitingForCommand2
+                            setCurrentState(machineState.waitingForCommand2)
                             cmdLine.stringValue = commandVerb.insert.rawValue
                         case "d","D":
                             //drive state
                             currentVerb = commandVerb.delete
-                            currentState = machineState.waitingForCommand2
+                            setCurrentState(machineState.waitingForCommand2)
                             cmdLine.stringValue = commandVerb.delete.rawValue
                         case "r","R":
                             //drive state
                             currentVerb = commandVerb.replace
-                            currentState = machineState.waitingForCommand2
+                            setCurrentState(machineState.waitingForCommand2)
                             cmdLine.stringValue = commandVerb.replace.rawValue
                         default:
                             super.keyUp(with: event)
@@ -175,27 +192,27 @@
                         case "t","T":
                             //drive state
                             currentNoun = commandNoun.text
-                            currentState = machineState.waitingForSelection1
+                            setCurrentState(machineState.waitingForSelection1)
                             cmdLine.stringValue = "\(currentVerb.rawValue) Text"
                         case "w","W":
                             //drive state
                             currentNoun = commandNoun.word
-                            currentState = machineState.waitingForSelection1
+                            setCurrentState(machineState.waitingForSelection1)
                             cmdLine.stringValue = "\(currentVerb.rawValue) Word"
                         case"I":
                             //drive state
                             currentNoun = commandNoun.invisible
-                            currentState = machineState.waitingForSelection1
+                            setCurrentState(machineState.waitingForSelection1) 
                             cmdLine.stringValue = "\(currentVerb.rawValue) Invisible"
                         case "v","V":
                             //drive state
                             currentNoun = commandNoun.visible
-                            currentState = machineState.waitingForSelection1
+                            setCurrentState(machineState.waitingForSelection1)
                             cmdLine.stringValue = "\(currentVerb.rawValue) Visible"
                         case "s","S":
                             //drive state
                             currentNoun = commandNoun.sentence
-                            currentState = machineState.waitingForSelection1
+                            setCurrentState(machineState.waitingForSelection1)
                             cmdLine.stringValue = "\(currentVerb.rawValue) Sentence"
                         default:
                             super.keyUp(with: event)
@@ -414,6 +431,5 @@
                     else {return NSMakeRange(0, 0)}
                 }
                 
-                
-            }
+             }
             

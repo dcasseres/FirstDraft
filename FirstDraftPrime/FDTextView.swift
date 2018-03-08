@@ -43,30 +43,49 @@
                 
                 @IBOutlet weak var cmdLine:NSTextField!
                 
-                @IBOutlet weak var modalEditing:NSButton!
+                @IBOutlet weak var MacStyle:NSTextField!
                 
-                @IBAction func modalAction(sender:NSButton){
+                @IBOutlet weak var NLSStyle:NSTextField!
+                
+                func setState(state:machineState)  {
+                    currentState = state
+                    switch state {
+                    case machineState.modeless:
+                        cmdLine.stringValue = "Mac-style text entry/editing"
+                        MacStyle.backgroundColor = NSColor.clear
+                        MacStyle.backgroundColor = NSColor.blue
+                        NLSStyle.backgroundColor = NSColor.clear
+                        NLSStyle.backgroundColor = NSColor.gray
+
+                    default:
+                        cmdLine.stringValue  = "NLS-style editing"
+                        MacStyle.backgroundColor = NSColor.clear
+                        MacStyle.backgroundColor = NSColor.gray
+                        NLSStyle.backgroundColor = NSColor.clear
+                        NLSStyle.backgroundColor = NSColor.green
+                    }
+                }
+                
+                @objc func modalAction(_ sender:Any?){
                     switch currentState {
                     case machineState.modeless:
-                        currentState = .waitingForCommand1
-                        cmdLine.stringValue  = "Begin modal editing"
+                        setState(state: .waitingForCommand1)
                     default:
-                        currentState = .modeless
-                        cmdLine.stringValue = "Begin modeless editing"
+                        setState(state: .modeless)
                     }
                     currentVerb = .noVerb
                     currentNoun = .noNoun
                 }
-            }
-               
-            extension FDTextView {
-                
+}
+
+extension FDTextView {
+    
                 func setCurrentState (_ newState: machineState) {
                     if currentState == machineState.modeless && newState != machineState.modeless {
                         cmdLine.stringValue  = "Begin NLS-style editing"
                     }
                      if currentState != machineState.modeless && newState == machineState.modeless {
-                        cmdLine.stringValue  = "Begin Mac-style editing"
+                        cmdLine.stringValue  = "Mac-style text entry/editing"
                     }
                 
                     currentState = newState
@@ -134,10 +153,9 @@
                         switch self.currentVerb {
                         case .delete:
                             self.cut(nil)
-                            self.setCurrentState(machineState.modeless)
+                            self.setState(state: machineState.modeless)
                             self.currentVerb = commandVerb.noVerb
                             self.currentNoun = commandNoun.noNoun
-                            cmdLine.stringValue = "Begin modelesss editing"
                         default:
                             super.mouseUp(with: event)
                         }

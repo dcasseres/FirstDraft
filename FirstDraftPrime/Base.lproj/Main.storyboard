@@ -725,6 +725,8 @@
                                             <size key="maxSize" width="463" height="10000000"/>
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <connections>
+                                                <outlet property="MacStyle" destination="2q7-uB-C67" id="46E-tf-ZWy"/>
+                                                <outlet property="NLSStyle" destination="Hh0-bO-FVB" id="xPo-RO-wSP"/>
                                                 <outlet property="cmdLine" destination="U9g-uq-LL6" id="3Dy-zW-hvs"/>
                                                 <outlet property="delegate" destination="XfG-lQ-9wD" id="Asd-JM-7jX"/>
                                             </connections>
@@ -749,17 +751,24 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Io5-HA-XIC">
-                                <rect key="frame" x="375" y="270" width="81" height="32"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" preferredMaxLayoutWidth="46" translatesAutoresizingMaskIntoConstraints="NO" id="Hh0-bO-FVB" customClass="Label">
+                                <rect key="frame" x="403" y="279" width="46" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ypq-Zs-Fbq">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="NLS" drawsBackground="YES" id="UEu-Uj-HeY">
                                     <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="modalActionWithSender:" target="CKV-KC-SXd" id="Zr8-cf-QWY"/>
-                                </connections>
-                            </button>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2q7-uB-C67">
+                                <rect key="frame" x="357" y="279" width="46" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Mac" drawsBackground="YES" id="RiZ-ZD-VKe">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="U9g-uq-LL6" secondAttribute="trailing" constant="139" id="JPY-38-e39"/>

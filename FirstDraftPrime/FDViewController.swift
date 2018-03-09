@@ -34,6 +34,8 @@ class FDViewController: NSViewController, NSTextViewDelegate {
         clickRecognizer2.target = textView!
         clickRecognizer2.action = #selector(FDTextView.modalAction)
         textView!.NLSStyle.addGestureRecognizer(clickRecognizer2)
+        
+        textView!.setState(state: FDTextView.machineState.modeless)
     }
     
     override var representedObject: Any? {

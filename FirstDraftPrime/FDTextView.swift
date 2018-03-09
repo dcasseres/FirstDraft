@@ -52,17 +52,12 @@
                     switch state {
                     case machineState.modeless:
                         cmdLine.stringValue = "Mac-style text entry/editing"
-                        MacStyle.backgroundColor = NSColor.clear
-                        MacStyle.backgroundColor = NSColor.blue
-                        NLSStyle.backgroundColor = NSColor.clear
-                        NLSStyle.backgroundColor = NSColor.gray
-
+                        MacStyle.backgroundColor = NSColor.systemBlue
+                        NLSStyle.backgroundColor = NSColor.systemGray
                     default:
                         cmdLine.stringValue  = "NLS-style editing"
-                        MacStyle.backgroundColor = NSColor.clear
-                        MacStyle.backgroundColor = NSColor.gray
-                        NLSStyle.backgroundColor = NSColor.clear
-                        NLSStyle.backgroundColor = NSColor.green
+                        MacStyle.backgroundColor = NSColor.systemGray
+                        NLSStyle.backgroundColor = NSColor.systemGreen
                     }
                 }
                 

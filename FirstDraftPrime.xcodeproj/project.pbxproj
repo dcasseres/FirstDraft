@@ -15,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		89CCC7752055A87B003A004D /* LICENCE.TXT */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENCE.TXT; sourceTree = "<group>"; };
 		89CF1C4520426CED00272685 /* FirstDraftPrime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FirstDraftPrime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89CF1C4820426CED00272685 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		89CF1C4A20426CED00272685 /* FDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FDViewController.swift; sourceTree = "<group>"; };
@@ -39,6 +40,7 @@
 		89CF1C3C20426CED00272685 = {
 			isa = PBXGroup;
 			children = (
+				89CCC7752055A87B003A004D /* LICENCE.TXT */,
 				89CF1C4720426CED00272685 /* FirstDraftPrime */,
 				89CF1C4620426CED00272685 /* Products */,
 			);

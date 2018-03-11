@@ -114,7 +114,7 @@ extension FDTextView {
                          .waitingForCommandAccept:
                         return
                     default:
-                        super.mouseDown(with: event)
+                        break
                     }
                 }
                 
@@ -139,10 +139,10 @@ extension FDTextView {
                                 self.setCurrentState(machineState.waitingForCommandAccept)
                                 cmdLine.stringValue = "Click anywhere to finish deletion"
                             default:
-                                super.mouseUp(with: event)
+                                break
                             }
                         default:
-                            super.mouseUp(with: event)
+                            break
                         }
                     case .waitingForCommandAccept:
                         switch self.currentVerb {
@@ -152,10 +152,10 @@ extension FDTextView {
                             self.currentVerb = commandVerb.noVerb
                             self.currentNoun = commandNoun.noNoun
                         default:
-                            super.mouseUp(with: event)
+                            break
                         }
                     default:
-                        super.mouseUp(with: event)
+                        break
                     }
                 }
                 

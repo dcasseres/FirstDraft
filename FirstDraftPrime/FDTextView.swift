@@ -152,17 +152,14 @@ extension FDTextView {
         case .waitingForCommandAccept:
             switch self.currentVerb {
             case .delete:
-//                textStorage!.beginEditing()
                 self.cut(nil)
                 self.setState(state: machineState.modeless)
                 self.currentVerb = commandVerb.noVerb
                 self.currentNoun = commandNoun.noNoun
                 self.clearSelectionHilite()
-//                textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, !.length))
                 let insertionPoint = self.selectedRange().location + self.selectedRange().length
                 self.setSelectedRange(NSMakeRange(insertionPoint, 0))
                 self.clearSelectionHilite()
-//                textStorage!.endEditing()
             default:
                 break
             }
@@ -252,7 +249,7 @@ extension FDTextView {
     func drawSelectionHilite() {
         self.clearSelectionHilite()
         textStorage!.addAttribute(NSAttributedStringKey.backgroundColor, value:
-            NSColor.selectedTextColor, range: self.selectedRange())
+            NSColor.selectedTextBackgroundColor, range: self.selectedRange())
 
     }
     

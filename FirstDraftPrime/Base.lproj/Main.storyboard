@@ -710,13 +710,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
-                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JTL-t0-tDs">
+                            <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JTL-t0-tDs">
                                 <rect key="frame" x="0.0" y="-5" width="450" height="280"/>
-                                <clipView key="contentView" id="ld7-zB-WzL">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <clipView key="contentView" ambiguous="YES" id="ld7-zB-WzL">
                                     <rect key="frame" x="1" y="1" width="448" height="278"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="CKV-KC-SXd" customClass="FDTextView" customModule="FirstDraftPrime" customModuleProvider="target">
+                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="CKV-KC-SXd" customClass="FDTextView" customModule="FirstDraftPrime" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="448" height="278"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -742,27 +743,26 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U9g-uq-LL6">
-                                <rect key="frame" x="6" y="279" width="307" height="17"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U9g-uq-LL6">
+                                <rect key="frame" x="6" y="279" width="308" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="Begin modeless editing" id="cOl-5O-w28">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="46" translatesAutoresizingMaskIntoConstraints="NO" id="Hh0-bO-FVB">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" preferredMaxLayoutWidth="46" translatesAutoresizingMaskIntoConstraints="NO" id="Hh0-bO-FVB">
                                 <rect key="frame" x="400" y="279" width="46" height="17"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="46" id="zx6-5H-3fN"/>
-                                </constraints>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="NLS" drawsBackground="YES" id="UEu-Uj-HeY">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2q7-uB-C67">
-                                <rect key="frame" x="353" y="279" width="47" height="17"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2q7-uB-C67">
+                                <rect key="frame" x="354" y="279" width="46" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Mac" drawsBackground="YES" id="RiZ-ZD-VKe">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -771,18 +771,8 @@
                             </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="U9g-uq-LL6" firstAttribute="baseline" secondItem="Hh0-bO-FVB" secondAttribute="baseline" id="4P0-df-vPs"/>
-                            <constraint firstItem="U9g-uq-LL6" firstAttribute="leading" secondItem="VVZ-B0-1r8" secondAttribute="leading" constant="8" id="6Pi-e9-XCF"/>
-                            <constraint firstAttribute="trailing" secondItem="Hh0-bO-FVB" secondAttribute="trailing" constant="4" id="9UT-iW-naM"/>
-                            <constraint firstAttribute="bottom" secondItem="JTL-t0-tDs" secondAttribute="bottom" constant="-5" id="FTc-6Y-wkw"/>
-                            <constraint firstItem="Hh0-bO-FVB" firstAttribute="leading" secondItem="2q7-uB-C67" secondAttribute="trailing" id="I6F-Kn-sdC"/>
-                            <constraint firstAttribute="trailing" secondItem="U9g-uq-LL6" secondAttribute="trailing" constant="139" id="JPY-38-e39"/>
-                            <constraint firstItem="U9g-uq-LL6" firstAttribute="top" secondItem="VVZ-B0-1r8" secondAttribute="top" constant="4" id="RLp-i0-6NR"/>
-                            <constraint firstAttribute="trailing" secondItem="JTL-t0-tDs" secondAttribute="trailing" id="YQV-fp-uzf"/>
-                            <constraint firstItem="JTL-t0-tDs" firstAttribute="top" secondItem="U9g-uq-LL6" secondAttribute="bottom" constant="4" id="YpB-PC-voS"/>
-                            <constraint firstItem="JTL-t0-tDs" firstAttribute="leading" secondItem="VVZ-B0-1r8" secondAttribute="leading" id="ohv-Cl-I8K"/>
-                            <constraint firstItem="2q7-uB-C67" firstAttribute="leading" secondItem="U9g-uq-LL6" secondAttribute="trailing" constant="42" id="uUH-qj-q5v"/>
-                            <constraint firstItem="U9g-uq-LL6" firstAttribute="baseline" secondItem="2q7-uB-C67" secondAttribute="baseline" id="uns-4A-sIR"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="U9g-uq-LL6" secondAttribute="trailing" id="JPY-38-e39"/>
+                            <constraint firstItem="U9g-uq-LL6" firstAttribute="leading" secondItem="VVZ-B0-1r8" secondAttribute="leading" constant="8" id="nN8-dA-RnF"/>
                         </constraints>
                     </customView>
                     <connections>

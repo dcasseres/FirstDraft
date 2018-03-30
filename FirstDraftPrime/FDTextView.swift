@@ -94,18 +94,6 @@ extension FDTextView {
         return NSMakePoint(convertedRect.origin.x, convertedRect.origin.y)
     }
     
-    //    override func setSelectedRange(_ charRange: NSRange, affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool)
-    //    {
-    //        switch self.currentState{
-    //        w
-    //            default:
-    //                super.setSelectedRange(charRange,affinity: affinity,stillSelecting: stillSelectingFlag)
-    //            }
-    //
-    //        default:
-    //            super.setSelectedRange(charRange,affinity: affinity,stillSelecting: z)
-    //        }.c
-    //    }
     override func mouseDown(with event: NSEvent) {
         switch self.currentState {
         case .waitingForCommand1,
@@ -223,7 +211,7 @@ extension FDTextView {
                 currentNoun = commandNoun.word
                 setCurrentState(machineState.waitingForSelection1)
                 cmdLine.stringValue = "\(currentVerb.rawValue) Word"
-            case"I":
+            case "i", "I":
                 //drive state
                 currentNoun = commandNoun.invisible
                 setCurrentState(machineState.waitingForSelection1)
@@ -268,6 +256,33 @@ extension FDTextView {
     }
     
     func rangeForWordAt(_ loc:Int) -> NSRange {
+        if let storage =  textStorage {
+            let str = storage.string
+         
+            
+            
+            
+            
+            var newIndex = str.index(str.startIndex, offsetBy: loc)
+            var newLoc = loc
+            var newLen = 0 
+            while newIndex > str.startIndex && isAlphanumeric(str[str.index(before:                                                                                                                                                                 newIndex)]){
+                newIndex = str.index(before: newIndex)
+                newLen = newLen + 1
+                newLoc = newLoc - 1
+            }
+            while ((newLoc + newLen) < str.count) && isAlphanumeric(str[str.index(after:newIndex)]){
+                newIndex = str.index(after:newIndex)
+                newLen = newLen + 1
+            }
+            let resultRange = NSMakeRange(newLoc, newLen)
+            return resultRange
+        }
+        else {return NSMakeRange(0, 0)}
+    }
+    
+
+    func rangeForCharTypeAt(_: ()->Bool, _ loc:Int) -> NSRange {
         if let storage =  textStorage {
             let str = storage.string
             

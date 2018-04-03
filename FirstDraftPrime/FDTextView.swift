@@ -121,7 +121,8 @@ extension FDTextView {
                     print(self.selectedRange())
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
-                    let myRange = self.textStorage!.doubleClick(at: clicked)
+//                    let myRange = self.textStorage!.doubleClick(at: clicked)
+                    let myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:)                 , clicked)
                     self.setSelectedRange(myRange)
                     print(self.selectedRange())
                     
@@ -248,21 +249,18 @@ extension FDTextView {
     
     func isAlphanumeric(_ ch: Character)-> Bool {
         let result = CharacterSet.init(charactersIn:String(ch)).isSubset(of: CharacterSet.alphanumerics)
-        if result {
-            return result
-        }else{
-            return result
-        }
+        return result
+    }
+
+    func isVisible(_ ch: Character)-> Bool {
+        let chSet = CharacterSet.init(charactersIn:String(ch))
+        let result = chSet.isSubset(of: CharacterSet.alphanumerics) || chSet.isSubset(of: CharacterSet.punctuationCharacters)
+        return result
     }
     
     func rangeForWordAt(_ loc:Int) -> NSRange {
         if let storage =  textStorage {
             let str = storage.string
-         
-            
-            
-            
-            
             var newIndex = str.index(str.startIndex, offsetBy: loc)
             var newLoc = loc
             var newLen = 0 
@@ -282,19 +280,19 @@ extension FDTextView {
     }
     
 
-    func rangeForCharTypeAt(_: ()->Bool, _ loc:Int) -> NSRange {
+    func rangeForCharTypeAt(typeCheck: (_ ch:Character)->Bool, _ loc:Int) -> NSRange {
         if let storage =  textStorage {
             let str = storage.string
             
             var newIndex = str.index(str.startIndex, offsetBy: loc)
             var newLoc = loc
             var newLen = 0
-            while newIndex > str.startIndex && isAlphanumeric(str[str.index(before:                                                                                                                                                                 newIndex)]){
+            while newIndex > str.startIndex && typeCheck(str[str.index(before:                                                                                                                                                                 newIndex)]){
                 newIndex = str.index(before: newIndex)
                 newLen = newLen + 1
                 newLoc = newLoc - 1
             }
-            while ((newLoc + newLen) < str.count) && isAlphanumeric(str[str.index(after:newIndex)]){
+            while ((newLoc + newLen) < str.count) && typeCheck(str[str.index(after:newIndex)]){
                 newIndex = str.index(after:newIndex)
                 newLen = newLen + 1
             }

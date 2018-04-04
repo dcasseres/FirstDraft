@@ -304,9 +304,6 @@ extension FDTextView {
                 newLen = newLen + 1
                 newLoc = newLoc - 1
             }
-//            if !typeCheck(str[newIndex]) {
-//                newIndex = str.index(after:newIndex)
-//            }
             newLen = 1
             while ((newLoc + newLen) < str.count) && typeCheck(str[str.index(after:newIndex)]){
                 newIndex = str.index(after:newIndex)

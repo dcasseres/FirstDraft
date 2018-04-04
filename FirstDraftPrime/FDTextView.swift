@@ -113,7 +113,7 @@ extension FDTextView {
             switch self.currentVerb {
             case .delete:
                 switch self.currentNoun {
-                case .word:
+                case .word, .visible:
 //                    textStorage!.beginEditing()
                     self.clearSelectionHilite()
 //                    textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
@@ -121,8 +121,13 @@ extension FDTextView {
                     print(self.selectedRange())
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
-//                    let myRange = self.textStorage!.doubleClick(at: clicked)
-                    let myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:)                 , clicked)
+                    var myRange = NSMakeRange(0, 0)
+                    switch self.currentNoun {
+                    case .word:
+                         myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:), clicked)
+                    default:
+                        myRange = self.rangeForCharTypeAt(typeCheck: isVisible(_:), clicked)
+                    }
                     self.setSelectedRange(myRange)
                     print(self.selectedRange())
                     
@@ -249,12 +254,19 @@ extension FDTextView {
     
     func isAlphanumeric(_ ch: Character)-> Bool {
         let result = CharacterSet.init(charactersIn:String(ch)).isSubset(of: CharacterSet.alphanumerics)
+        if result {
+            print("TRUE")
+        }else{
+            print("FALSE")
+        }
+        print(ch.description)
         return result
     }
 
     func isVisible(_ ch: Character)-> Bool {
         let chSet = CharacterSet.init(charactersIn:String(ch))
-        let result = chSet.isSubset(of: CharacterSet.alphanumerics) || chSet.isSubset(of: CharacterSet.punctuationCharacters)
+        let result = !chSet.isSubset(of: CharacterSet.whitespaces)
+        
         return result
     }
     
@@ -292,6 +304,10 @@ extension FDTextView {
                 newLen = newLen + 1
                 newLoc = newLoc - 1
             }
+//            if !typeCheck(str[newIndex]) {
+//                newIndex = str.index(after:newIndex)
+//            }
+            newLen = 1
             while ((newLoc + newLen) < str.count) && typeCheck(str[str.index(after:newIndex)]){
                 newIndex = str.index(after:newIndex)
                 newLen = newLen + 1

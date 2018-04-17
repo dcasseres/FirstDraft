@@ -12,12 +12,25 @@ import AppKit
 class FDTextView: NSTextView {
     
     enum machineState {
-        case modeless
-        case waitingForCommand1
-        case waitingForCommand2
-        case waitingForSelection1
-        case waitingForSelection2
-        case waitingForCommandAccept
+        case modeless                   //Mac style
+        
+        case waitingForCommand1         //Key event processed as command if posssible, else ignored;
+                                        //  mouse events ignored
+        
+        case waitingForCommand2         //Key event processed as command if posssible, else ignored;
+                                        //  mouse events ignored
+        
+        case waitingForSelection1       //Mouse events processed as selection if posssible, else ignored:
+                                        //  backspace processed as CD if possible; other key events ignored
+        
+        case waitingForSelection2       //Mouse events processed as selection if posssible, else ignored:
+                                        //  backspace processed as CD if possible; other key events ignored
+        
+        case NLSTextEntry               //Mouse event processed as CA if posssible, else ignored:
+                                        //  backspace processed as CD if possible; other key events entered as text
+        
+        case waitingForCommandAccept    //Mouse event processed as CA if posssible, else ignored:
+                                        //  backspace processed as CD if possible; other key events ignored
     }
     
     enum commandVerb: String {
@@ -55,8 +68,13 @@ class FDTextView: NSTextView {
             cmdLine.stringValue = "Mac-style text entry/editing"
             MacStyle.backgroundColor = NSColor.systemBlue
             NLSStyle.backgroundColor = NSColor.systemGray
+        case machineState.NLSTextEntry:
+            currentVerb = commandVerb.append
+            currentNoun = commandNoun.text
+            MacStyle.backgroundColor = NSColor.systemGray
+            NLSStyle.backgroundColor = NSColor.systemGreen
         default:
-            cmdLine.stringValue  = "NLS-style editing"
+            cmdLine.stringValue  = "NLS-style editing: Type the first letter of a command "
             MacStyle.backgroundColor = NSColor.systemGray
             NLSStyle.backgroundColor = NSColor.systemGreen
         }
@@ -100,6 +118,7 @@ extension FDTextView {
              .waitingForCommand2,
              .waitingForSelection1,
              .waitingForSelection2,
+             .NLSTextEntry,
              .waitingForCommandAccept:
             return
         default:
@@ -109,7 +128,7 @@ extension FDTextView {
     
     override func mouseUp(with event: NSEvent) {
         switch self.currentState {
-        case .modeless:
+        case .modeless, .NLSTextEntry:
             self.clearSelectionHilite()
             textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
             
@@ -125,24 +144,25 @@ extension FDTextView {
                     self.clearSelectionHilite()
                     textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
                     
-                    print(self.selectedRange())
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
-                    var myRange = NSMakeRange(0, 0)
-                    switch self.currentNoun {
+                    var myRange = (false, NSMakeRange(0, 0))
+                      switch self.currentNoun {
                     case .word:
-                         myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:), clicked)
+                        myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:), clicked)
                     case .invisible:
                         myRange = self.rangeForCharTypeAt(typeCheck: isInvisible(_:), clicked)
                     default:
                         myRange = self.rangeForCharTypeAt(typeCheck: isVisible(_:), clicked)
                     }
-                    self.setSelectedRange(myRange)
-                    print(self.selectedRange())
-                    
-                    self.drawSelectionHilite()
-                    self.setCurrentState(machineState.waitingForCommandAccept)
-                    cmdLine.stringValue = "Click anywhere to finish deletion"
+                    if myRange.0 {
+                        self.setSelectedRange(myRange.1)
+                        self.drawSelectionHilite()
+                        self.setCurrentState(machineState.waitingForCommandAccept)
+                        cmdLine.stringValue = "Click anywhere to finish deletion"
+                    }else{
+                        return
+                    }
                 default:
                     return
                 }
@@ -153,9 +173,10 @@ extension FDTextView {
             switch self.currentVerb {
             case .delete:
                 self.cut(nil)
-                self.setState(state: machineState.modeless)
-                self.currentVerb = commandVerb.noVerb
-                self.currentNoun = commandNoun.noNoun
+                self.setState(state: machineState.NLSTextEntry)
+                self.currentVerb = commandVerb.append
+                self.currentNoun = commandNoun.text
+                cmdLine.stringValue = "\(currentVerb.rawValue) \(currentNoun.rawValue)"
                 self.clearSelectionHilite()
                 let insertionPoint = self.selectedRange().location + self.selectedRange().length
                 self.setSelectedRange(NSMakeRange(insertionPoint, 0))
@@ -241,7 +262,7 @@ extension FDTextView {
             default:
                 super.keyUp(with: event)
             }
-        default:
+          default:
             super.keyUp(with: event)
         }
     }
@@ -250,7 +271,7 @@ extension FDTextView {
         self.clearSelectionHilite()
         textStorage!.addAttribute(NSAttributedStringKey.backgroundColor, value:
             NSColor.selectedTextBackgroundColor, range: self.selectedRange())
-
+        
     }
     
     func clearSelectionHilite() {
@@ -262,7 +283,7 @@ extension FDTextView {
         let result = CharacterSet.init(charactersIn:String(ch)).isSubset(of: CharacterSet.alphanumerics)
         return result
     }
-
+    
     func isVisible(_ ch: Character)-> Bool {
         let chSet = CharacterSet.init(charactersIn:String(ch))
         let result = !chSet.isSubset(of: CharacterSet.whitespaces)
@@ -277,29 +298,29 @@ extension FDTextView {
         return result
     }
     
-//    func rangeForWordAt(_ loc:Int) -> NSRange {
-//        if let storage =  textStorage {
-//            let str = storage.string
-//            var newIndex = str.index(str.startIndex, offsetBy: loc)
-//            var newLoc = loc
-//            var newLen = 0
-//            while newIndex > str.startIndex && isAlphanumeric(str[str.index(before:                                                                                                                                                                 newIndex)]){
-//                newIndex = str.index(before: newIndex)
-//                newLen = newLen + 1
-//                newLoc = newLoc - 1
-//            }
-//            while ((newLoc + newLen) < str.count) && isAlphanumeric(str[str.index(after:newIndex)]){
-//                newIndex = str.index(after:newIndex)
-//                newLen = newLen + 1
-//            }
-//            let resultRange = NSMakeRange(newLoc, newLen)
-//            return resultRange
-//        }
-//        else {return NSMakeRange(0, 0)}
-//    }
+    //    func rangeForWordAt(_ loc:Int) -> NSRange {
+    //        if let storage =  textStorage {
+    //            let str = storage.string
+    //            var newIndex = str.index(str.startIndex, offsetBy: loc)
+    //            var newLoc = loc
+    //            var newLen = 0
+    //            while newIndex > str.startIndex && isAlphanumeric(str[str.index(before:                                                                                                                                                                 newIndex)]){
+    //                newIndex = str.index(before: newIndex)
+    //                newLen = newLen + 1
+    //                newLoc = newLoc - 1
+    //            }
+    //            while ((newLoc + newLen) < str.count) && isAlphanumeric(str[str.index(after:newIndex)]){
+    //                newIndex = str.index(after:newIndex)
+    //                newLen = newLen + 1
+    //            }
+    //            let resultRange = NSMakeRange(newLoc, newLen)
+    //            return resultRange
+    //        }
+    //        else {return NSMakeRange(0, 0)}
+    //    }
     
-
-    func rangeForCharTypeAt(typeCheck: (_ ch:Character)->Bool, _ loc:Int) -> NSRange {
+    
+    func rangeForCharTypeAt(typeCheck: (_ ch:Character)->Bool, _ loc:Int) -> (Bool, NSRange) {
         if let storage =  textStorage {
             let str = storage.string
             
@@ -307,22 +328,35 @@ extension FDTextView {
             var newLoc = loc
             var newLen = 0
             var newIndex = str.index(str.startIndex, offsetBy: loc)
-            //bail if this is not a specified-typeaaa char
+            if newIndex < str.startIndex || newIndex > str.endIndex {
+                return (false, NSMakeRange(0, 0))
+            }
+            
+            //bail if this is not a specifed-type char
+            if !typeCheck(str[newIndex]) {
+                return (false, NSMakeRange(0, 0))
+            }
             //move left, counting chars of specified type
-            while newIndex > str.startIndex && typeCheck(str[str.index(before:                                                                                                                                                                 newIndex)]){
+            while newIndex > str.startIndex {
+                if !typeCheck(str[str.index(before: newIndex)]) {
+                    break
+                }
                 newIndex = str.index(before: newIndex)
                 newLen = newLen + 1
                 newLoc = newLoc - 1
             }
             newLen = 1
-            while ((newLoc + newLen) < str.count) && typeCheck(str[str.index(after:newIndex)]){
+            while ((newLoc + newLen) < str.count) {
+                if !typeCheck(str[str.index(after:newIndex)]){
+                    break
+                }
                 newIndex = str.index(after:newIndex)
                 newLen = newLen + 1
             }
             let resultRange = NSMakeRange(newLoc, newLen)
-            return resultRange
+            return (true, resultRange)
         }
-        else {return NSMakeRange(0, 0)}
+        else {return (false, NSMakeRange(0, 0))}
     }
     
 }

@@ -130,7 +130,6 @@ extension FDTextView {
         switch self.currentState {
         case .modeless, .NLSTextEntry:
             self.clearSelectionHilite()
-            textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
             
             let pointInView = self.convertPointFromWindow(event.locationInWindow)
             let clicked = self.characterIndexForInsertion(at: pointInView)
@@ -142,7 +141,6 @@ extension FDTextView {
                 switch self.currentNoun {
                 case .word, .visible, .invisible:
                     self.clearSelectionHilite()
-                    textStorage!.removeAttribute(NSAttributedStringKey.backgroundColor, range: NSMakeRange(0, textStorage!.length))
                     
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
@@ -171,10 +169,10 @@ extension FDTextView {
             }
         case .waitingForCommandAccept:
             switch self.currentVerb {
-            case .delete:
+            case .delete, .insert:
                 self.cut(nil)
                 self.setState(state: machineState.NLSTextEntry)
-                self.currentVerb = commandVerb.append
+                self.currentVerb = commandVerb.insert
                 self.currentNoun = commandNoun.text
                 cmdLine.stringValue = "\(currentVerb.rawValue) \(currentNoun.rawValue)"
                 self.clearSelectionHilite()

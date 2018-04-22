@@ -15,22 +15,22 @@ class FDTextView: NSTextView {
         case modeless                   //Mac style
         
         case waitingForCommand1         //Key event processed as command if posssible, else ignored;
-                                        //  mouse events ignored
+        //  mouse events ignored
         
         case waitingForCommand2         //Key event processed as command if posssible, else ignored;
-                                        //  mouse events ignored
+        //  mouse events ignored
         
         case waitingForSelection1       //Mouse events processed as selection if posssible, else ignored:
-                                        //  backspace processed as CD if possible; other key events ignored
+        //  backspace processed as CD if possible; other key events ignored
         
         case waitingForSelection2       //Mouse events processed as selection if posssible, else ignored:
-                                        //  backspace processed as CD if possible; other key events ignored
+        //  backspace processed as CD if possible; other key events ignored
         
         case NLSTextEntry               //Mouse event processed as CA if posssible, else ignored:
-                                        //  backspace processed as CD if possible; other key events entered as text
+        //  backspace processed as CD if possible; other key events entered as text
         
         case waitingForCommandAccept    //Mouse event processed as CA if posssible, else ignored:
-                                        //  backspace processed as CD if possible; other key events ignored
+        //  backspace processed as CD if possible; other key events ignored
     }
     
     enum commandVerb: String {
@@ -50,11 +50,16 @@ class FDTextView: NSTextView {
         case noNoun = "NoNoun"
     }
     
-    var currentState = machineState.modeless
+    /* GLOBAL DATA OF THE STATE MACHINE */
     
+    var currentState = machineState.modeless
     var currentVerb: commandVerb = commandVerb.noVerb
     var currentNoun: commandNoun = commandNoun.noNoun
     
+    var breadcrumbState = machineState.modeless
+    var breadcrumbVerb: commandVerb = commandVerb.noVerb
+    var breadcrumbNoun: commandNoun = commandNoun.noNoun
+
     @IBOutlet weak var cmdLine:NSTextField!
     
     @IBOutlet weak var MacStyle:NSTextField!
@@ -78,6 +83,20 @@ class FDTextView: NSTextView {
             MacStyle.backgroundColor = NSColor.systemGray
             NLSStyle.backgroundColor = NSColor.systemGreen
         }
+        setBreadcrumbs()
+    }
+    
+    func setBreadcrumbs() {
+        breadcrumbState = currentState
+        breadcrumbNoun = currentNoun
+        breadcrumbVerb = currentVerb
+    }
+    
+    func restoreStateFromBreadcrumbs() {
+        currentState = breadcrumbState
+        currentVerb = breadcrumbVerb
+        currentNoun
+            = breadcrumbNoun
     }
     
     @objc func modalAction(_ sender:Any?){
@@ -101,7 +120,7 @@ extension FDTextView {
         if currentState != machineState.modeless && newState == machineState.modeless {
             cmdLine.stringValue  = "Mac-style text entry/editing"
         }
-        
+
         currentState = newState
     }
     
@@ -144,8 +163,8 @@ extension FDTextView {
                     
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
-                    var myRange = (false, NSMakeRange(0, 0))
-                      switch self.currentNoun {
+                    var myRange = (valid: false, range: NSMakeRange(0, 0))
+                    switch self.currentNoun {
                     case .word:
                         myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:), clicked)
                     case .invisible:
@@ -153,8 +172,8 @@ extension FDTextView {
                     default:
                         myRange = self.rangeForCharTypeAt(typeCheck: isVisible(_:), clicked)
                     }
-                    if myRange.0 {
-                        self.setSelectedRange(myRange.1)
+                    if myRange.valid {
+                        self.setSelectedRange(myRange.range)
                         self.drawSelectionHilite()
                         self.setCurrentState(machineState.waitingForCommandAccept)
                         cmdLine.stringValue = "Click anywhere to finish deletion"
@@ -164,6 +183,15 @@ extension FDTextView {
                 default:
                     return
                 }
+            case .insert, .append:
+                self.clearSelectionHilite()
+                
+                let pointInView = self.convertPointFromWindow(event.locationInWindow)
+                let clicked = self.characterIndexForInsertion(at: pointInView)
+                self.setSelectedRange(NSMakeRange(clicked, 0))
+                self.drawSelectionHilite()
+                self.setCurrentState(machineState.waitingForCommandAccept)
+                cmdLine.stringValue = "Type to add text; click anywhere to finish."
             default:
                 return
             }
@@ -203,17 +231,45 @@ extension FDTextView {
     
     override func keyUp(with event: NSEvent) {
         self.clearSelectionHilite()
+        if  let ch = event.charactersIgnoringModifiers?.first {
+            let chStr = String(ch)
+            let bsChar = "\u{7f}"
+            if chStr == bsChar
+            {
+                if event.modifierFlags.contains(.command) {
+                    switch self.currentState {
+                    case .waitingForCommand1:
+                        restoreStateFromBreadcrumbs()
+                        return
+                    case .waitingForCommand2:
+                        restoreStateFromBreadcrumbs()
+                        return
+                    case .waitingForSelection1:
+                        restoreStateFromBreadcrumbs()
+                        return
+                    case .waitingForSelection2:
+                        restoreStateFromBreadcrumbs()
+                        return
+                    case .waitingForCommandAccept:
+                        restoreStateFromBreadcrumbs()
+                        return
+                    default:
+                        super.keyUp(with: event)
+                    }
+                }
+            }
+        }
         switch self.currentState {
         case .waitingForCommand1:
             switch event.charactersIgnoringModifiers!.first!{
             case "a","A":
                 //drive state
-                currentVerb = commandVerb.append
+                currentVerb =  .append
                 setCurrentState(machineState.waitingForCommand2)
                 cmdLine.stringValue = commandVerb.append.rawValue
             case "i","I":
                 //drive state
-                currentVerb = commandVerb.insert
+                currentVerb = .insert
                 setCurrentState(machineState.waitingForCommand2)
                 cmdLine.stringValue = commandVerb.insert.rawValue
             case "d","D":
@@ -236,7 +292,7 @@ extension FDTextView {
                 //drive state
                 currentNoun = commandNoun.text
                 setCurrentState(machineState.waitingForSelection1)
-                cmdLine.stringValue = "\(currentVerb.rawValue) Text"
+                cmdLine.stringValue = "\(currentVerb.rawValue) Text: click to select insertion target"
             case "w","W":
                 //drive state
                 currentNoun = commandNoun.word
@@ -260,7 +316,9 @@ extension FDTextView {
             default:
                 super.keyUp(with: event)
             }
-          default:
+//        case .waitingForSelection1, .waitingForSelection2:
+            
+        default:
             super.keyUp(with: event)
         }
     }
@@ -318,7 +376,7 @@ extension FDTextView {
     //    }
     
     
-    func rangeForCharTypeAt(typeCheck: (_ ch:Character)->Bool, _ loc:Int) -> (Bool, NSRange) {
+    func rangeForCharTypeAt(typeCheck: (_ ch:Character)->Bool, _ loc:Int) -> (valid: Bool, range: NSRange) {
         if let storage =  textStorage {
             let str = storage.string
             

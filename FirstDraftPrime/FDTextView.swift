@@ -229,6 +229,66 @@ extension FDTextView {
         }
     }
     
+    fileprivate func trapCmd1Chars (_ event: NSEvent) {
+        /*SWITCH ON input chars */
+        switch event.charactersIgnoringModifiers!.first!{
+        case "a","A":
+            //drive state
+            currentVerb =  .append
+            setCurrentState(machineState.waitingForCommand2)
+            cmdLine.stringValue = commandVerb.append.rawValue
+        case "i","I":
+            //drive state
+            currentVerb = .insert
+            setCurrentState(machineState.waitingForCommand2)
+            cmdLine.stringValue = commandVerb.insert.rawValue
+        case "d","D":
+            //drive state
+            currentVerb = commandVerb.delete
+            setCurrentState(machineState.waitingForCommand2)
+            cmdLine.stringValue = commandVerb.delete.rawValue
+        case "r","R":
+            //drive state
+            currentVerb = commandVerb.replace
+            setCurrentState(machineState.waitingForCommand2)
+            cmdLine.stringValue = commandVerb.replace.rawValue
+        default:
+            super.keyUp(with: event)
+        }
+    }
+    
+    fileprivate func trapCmd2Chars(_ event: NSEvent) {
+        switch event.charactersIgnoringModifiers!.first!{
+        case "t","T":
+            //drive state
+            currentNoun = commandNoun.text
+            setCurrentState(machineState.waitingForSelection1)
+            cmdLine.stringValue = "\(currentVerb.rawValue) Text: click to select insertion target"
+        case "w","W":
+            //drive state
+            currentNoun = commandNoun.word
+            setCurrentState(machineState.waitingForSelection1)
+            cmdLine.stringValue = "\(currentVerb.rawValue) Word"
+        case "i", "I":
+            //drive state
+            currentNoun = commandNoun.invisible
+            setCurrentState(machineState.waitingForSelection1)
+            cmdLine.stringValue = "\(currentVerb.rawValue) Invisible"
+        case "v","V":
+            //drive state
+            currentNoun = commandNoun.visible
+            setCurrentState(machineState.waitingForSelection1)
+            cmdLine.stringValue = "\(currentVerb.rawValue) Visible"
+        case "s","S":
+            //drive state
+            currentNoun = commandNoun.sentence
+            setCurrentState(machineState.waitingForSelection1)
+            cmdLine.stringValue = "\(currentVerb.rawValue) Sentence"
+        default:
+            super.keyUp(with: event)
+        }
+    }
+    
     override func keyUp(with event: NSEvent) {
         self.clearSelectionHilite()
         if  let ch = event.charactersIgnoringModifiers?.first {
@@ -259,64 +319,13 @@ extension FDTextView {
                 }
             }
         }
+/*SWITCH ON MACHINE STATE; */
         switch self.currentState {
         case .waitingForCommand1:
-            switch event.charactersIgnoringModifiers!.first!{
-            case "a","A":
-                //drive state
-                currentVerb =  .append
-                setCurrentState(machineState.waitingForCommand2)
-                cmdLine.stringValue = commandVerb.append.rawValue
-            case "i","I":
-                //drive state
-                currentVerb = .insert
-                setCurrentState(machineState.waitingForCommand2)
-                cmdLine.stringValue = commandVerb.insert.rawValue
-            case "d","D":
-                //drive state
-                currentVerb = commandVerb.delete
-                setCurrentState(machineState.waitingForCommand2)
-                cmdLine.stringValue = commandVerb.delete.rawValue
-            case "r","R":
-                //drive state
-                currentVerb = commandVerb.replace
-                setCurrentState(machineState.waitingForCommand2)
-                cmdLine.stringValue = commandVerb.replace.rawValue
-            default:
-                super.keyUp(with: event)
-            }
+            trapCmd1Chars(event)
             
         case .waitingForCommand2:
-            switch event.charactersIgnoringModifiers!.first!{
-            case "t","T":
-                //drive state
-                currentNoun = commandNoun.text
-                setCurrentState(machineState.waitingForSelection1)
-                cmdLine.stringValue = "\(currentVerb.rawValue) Text: click to select insertion target"
-            case "w","W":
-                //drive state
-                currentNoun = commandNoun.word
-                setCurrentState(machineState.waitingForSelection1)
-                cmdLine.stringValue = "\(currentVerb.rawValue) Word"
-            case "i", "I":
-                //drive state
-                currentNoun = commandNoun.invisible
-                setCurrentState(machineState.waitingForSelection1)
-                cmdLine.stringValue = "\(currentVerb.rawValue) Invisible"
-            case "v","V":
-                //drive state
-                currentNoun = commandNoun.visible
-                setCurrentState(machineState.waitingForSelection1)
-                cmdLine.stringValue = "\(currentVerb.rawValue) Visible"
-            case "s","S":
-                //drive state
-                currentNoun = commandNoun.sentence
-                setCurrentState(machineState.waitingForSelection1)
-                cmdLine.stringValue = "\(currentVerb.rawValue) Sentence"
-            default:
-                super.keyUp(with: event)
-            }
-//        case .waitingForSelection1, .waitingForSelection2:
+            trapCmd2Chars(event)
             
         default:
             super.keyUp(with: event)

@@ -12,8 +12,6 @@ import AppKit
 class FDTextView: NSTextView {
     
     enum machineState {
-        case modeless                   //Mac style
-        
         case waitingForCommand1         //Key event processed as command if posssible, else ignored;
         //  mouse events ignored
         
@@ -52,36 +50,25 @@ class FDTextView: NSTextView {
     
     /* GLOBAL DATA OF THE STATE MACHINE */
     
-    var currentState = machineState.modeless
-    var currentVerb: commandVerb = commandVerb.noVerb
-    var currentNoun: commandNoun = commandNoun.noNoun
+    var currentState = machineState.NLSTextEntry
+    var currentVerb: commandVerb = commandVerb.append
+    var currentNoun: commandNoun = commandNoun.text
     
-    var breadcrumbState = machineState.modeless
-    var breadcrumbVerb: commandVerb = commandVerb.noVerb
-    var breadcrumbNoun: commandNoun = commandNoun.noNoun
+    var breadcrumbState = machineState.NLSTextEntry
+    var breadcrumbVerb: commandVerb = commandVerb.append
+    var breadcrumbNoun: commandNoun = commandNoun.text
 
     @IBOutlet weak var cmdLine:NSTextField!
-    
-    @IBOutlet weak var MacStyle:NSTextField!
-    
-    @IBOutlet weak var NLSStyle:NSTextField!
     
     func setState(state:machineState)  {
         currentState = state
         switch state {
-        case machineState.modeless:
-            cmdLine.stringValue = "Mac-style text entry/editing"
-            MacStyle.backgroundColor = NSColor.systemBlue
-            NLSStyle.backgroundColor = NSColor.systemGray
+        case machineState.waitingForCommand1:
+            cmdLine.stringValue = "Type the initials of a command "
         case machineState.NLSTextEntry:
             currentVerb = commandVerb.append
             currentNoun = commandNoun.text
-            MacStyle.backgroundColor = NSColor.systemGray
-            NLSStyle.backgroundColor = NSColor.systemGreen
-        default:
-            cmdLine.stringValue  = "NLS-style editing: Type the first letter of a command "
-            MacStyle.backgroundColor = NSColor.systemGray
-            NLSStyle.backgroundColor = NSColor.systemGreen
+        default: break
         }
         setBreadcrumbs()
     }
@@ -101,23 +88,23 @@ class FDTextView: NSTextView {
     
     @objc func modalAction(_ sender:Any?){
         switch currentState {
-        case machineState.modeless:
+        case machineState.waitingForCommand1:
             setState(state: .waitingForCommand1)
         default:
-            setState(state: .modeless)
+            setState(state: .waitingForCommand1)
         }
         currentVerb = .noVerb
         currentNoun = .noNoun
     }
 }
 
-extension FDTextView {
+extension [[[[[FDTextView]]]]] {
     
     func setCurrentState (_ newState: machineState) {
-        if currentState == machineState.modeless && newState != machineState.modeless {
+        if currentState == machineState.waitingForCommand1 && newState != machineState.waitingForCommand1 {
             cmdLine.stringValue  = "Begin NLS-style editing"
         }
-        if currentState != machineState.modeless && newState == machineState.modeless {
+        if currentState != machineState.waitingForCommand1 && newState == machineState.waitingForCommand1 {
             cmdLine.stringValue  = "Mac-style text entry/editing"
         }
 
@@ -147,7 +134,7 @@ extension FDTextView {
     
     override func mouseUp(with event: NSEvent) {
         switch self.currentState {
-        case .modeless, .NLSTextEntry:
+        case .waitingForCommand1, .NLSTextEntry:
             self.clearSelectionHilite()
             
             let pointInView = self.convertPointFromWindow(event.locationInWindow)

@@ -26,16 +26,8 @@ class FDViewController: NSViewController, NSTextViewDelegate {
         //        }
         
         // Do any additional setup after loading the view.
-        let clickRecognizer1 = NSClickGestureRecognizer()
-        clickRecognizer1.target = textView!
-        clickRecognizer1.action = #selector(FDTextView.modalAction)
-        textView!.NLSStyle.addGestureRecognizer(clickRecognizer1)
-        let clickRecognizer2 = NSClickGestureRecognizer()
-        clickRecognizer2.target = textView!
-        clickRecognizer2.action = #selector(FDTextView.modalAction)
-        textView!.MacStyle.addGestureRecognizer(clickRecognizer2)
-        
-        textView!.setState(state: FDTextView.machineState.modeless)
+         
+        textView!.setState(state: FDTextView.machineState.waitingForCommand1)
     }
     
     override var representedObject: Any? {
@@ -48,11 +40,7 @@ class FDViewController: NSViewController, NSTextViewDelegate {
 extension FDViewController {
     
     override func viewDidAppear() {
-        let pushGestureRecognizer1  = NSClickGestureRecognizer.init(target: self.textView!, action: #selector(FDTextView.modalAction))
-        let pushGestureRecognizer2  = NSClickGestureRecognizer.init(target: self.textView!, action: #selector(FDTextView.modalAction))
-        textView!.NLSStyle.addGestureRecognizer(pushGestureRecognizer1)
-        textView!.MacStyle.addGestureRecognizer(pushGestureRecognizer2)
-    }
+        }
 
 }
  

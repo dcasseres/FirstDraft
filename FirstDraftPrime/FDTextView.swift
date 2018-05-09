@@ -98,7 +98,7 @@ class FDTextView: NSTextView {
     }
 }
 
-extension [[[[[FDTextView]]]]] {
+extension FDTextView {
     
     func setCurrentState (_ newState: machineState) {
         if currentState == machineState.waitingForCommand1 && newState != machineState.waitingForCommand1 {

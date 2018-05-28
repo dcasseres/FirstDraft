@@ -11,24 +11,41 @@ import AppKit
 
 class FDTextView: NSTextView {
     
-    enum machineState {
-        case waitingForCommand1         //Key event processed as command if posssible, else ignored;
-        //  mouse events ignored
+enum machinePhase: String {
+        case waitingForCommand1         = "waitingForCommand1"
+                                        //Key event processed as command if
+                                        //possible, else ignored; mouse
+                                        //events ignored
         
-        case waitingForCommand2         //Key event processed as command if posssible, else ignored;
-        //  mouse events ignored
+        case waitingForCommand2         = "waitingForCommand2"
+                                        //Key event processed as command if
+                                        //possible, else ignored; mouse events
+                                        //ignored
         
-        case waitingForSelection1       //Mouse events processed as selection if posssible, else ignored:
-        //  backspace processed as CD if possible; other key events ignored
+        case waitingForSelection1       = "waitingForSelection1"
+                                        //Mouse events processed as selection
+                                        //if possible, else ignored:
+                                        //backspace processed as CD if
+                                        //possible; other key events ignored
         
-        case waitingForSelection2       //Mouse events processed as selection if posssible, else ignored:
-        //  backspace processed as CD if possible; other key events ignored
+        case waitingForSelection2       = "waitingForSelection2"
+                                        //Mouse events processed as selection
+                                        //if possible, else ignored:
+                                        //backspace processed as CD if
+                                        //possible; other key events ignored
         
-        case NLSTextEntry               //Mouse event processed as CA if posssible, else ignored:
-        //  backspace processed as CD if possible; other key events entered as text
+        case NLSTextEntry               = "NLSTextEntry"
+                                        //Mouse event processed as CA if
+                                        //possible, else ignored:
+                                        //backspace processed as CD if
+                                        //possible; other key events entered
+                                        //as text
         
-        case waitingForCommandAccept    //Mouse event processed as CA if posssible, else ignored:
-        //  backspace processed as CD if possible; other key events ignored
+        case waitingForCommandAccept    = "waitingForCommandAccept"
+                                        //Mouse event processed as CA if
+                                        //possible, else ignored:
+                                        //backspace processed as CD if
+                                        //possible; other key events ignored
     }
     
     enum commandVerb: String {
@@ -48,24 +65,31 @@ class FDTextView: NSTextView {
         case noNoun = "NoNoun"
     }
     
+    struct machineState {
+        var phase = machinePhase.NLSTextEntry
+        var verb = commandVerb.append
+        var noun = commandNoun.text
+    }
+    
     /* GLOBAL DATA OF THE STATE MACHINE */
     
-    var currentState = machineState.NLSTextEntry
+    
+    var currentState = machineState.init()
     var currentVerb: commandVerb = commandVerb.append
     var currentNoun: commandNoun = commandNoun.text
     
-    var breadcrumbState = machineState.NLSTextEntry
+    var breadcrumbState = machinePhase.NLSTextEntry
     var breadcrumbVerb: commandVerb = commandVerb.append
     var breadcrumbNoun: commandNoun = commandNoun.text
 
     @IBOutlet weak var cmdLine:NSTextField!
     
-    func setState(state:machineState)  {
-        currentState = state
+    func setState(state:machinePhase)  {
+        currentState.phase = state
         switch state {
-        case machineState.waitingForCommand1:
+        case machinePhase.waitingForCommand1:
             cmdLine.stringValue = "Type the initials of a command "
-        case machineState.NLSTextEntry:
+        case machinePhase.NLSTextEntry:
             currentVerb = commandVerb.append
             currentNoun = commandNoun.text
         default: break
@@ -73,22 +97,26 @@ class FDTextView: NSTextView {
         setBreadcrumbs()
     }
     
+    func setPhase (phase: machinePhase){
+        currentState.phase = phase
+    }
+    
     func setBreadcrumbs() {
-        breadcrumbState = currentState
+        breadcrumbState = currentState.phase
         breadcrumbNoun = currentNoun
         breadcrumbVerb = currentVerb
     }
     
     func restoreStateFromBreadcrumbs() {
-        currentState = breadcrumbState
+        currentState.phase = breadcrumbState
         currentVerb = breadcrumbVerb
         currentNoun
             = breadcrumbNoun
     }
     
     @objc func modalAction(_ sender:Any?){
-        switch currentState {
-        case machineState.waitingForCommand1:
+        switch currentState.phase {
+        case machinePhase.waitingForCommand1:
             setState(state: .waitingForCommand1)
         default:
             setState(state: .waitingForCommand1)
@@ -100,15 +128,15 @@ class FDTextView: NSTextView {
 
 extension FDTextView {
     
-    func setCurrentState (_ newState: machineState) {
-        if currentState == machineState.waitingForCommand1 && newState != machineState.waitingForCommand1 {
-            cmdLine.stringValue  = "Begin NLS-style editing"
-        }
-        if currentState != machineState.waitingForCommand1 && newState == machineState.waitingForCommand1 {
-            cmdLine.stringValue  = "Mac-style text entry/editing"
-        }
+    func setCurrentState (_ newState: machinePhase) {
+//        if currentState == machinePhase.waitingForCommand1 && newState != machinePhase.waitingForCommand1 {
+//            cmdLine.stringValue  = "Begin NLS-style editing"
+//        }
+//        if currentState != machinePhase.waitingForCommand1 && newState == machinePhase.waitingForCommand1 {
+//            cmdLine.stringValue  = "Mac-style text entry/editing"
+//        }
 
-        currentState = newState
+        currentState.phase = newState
     }
     
     
@@ -119,21 +147,29 @@ extension FDTextView {
     }
     
     override func mouseDown(with event: NSEvent) {
-        switch self.currentState {
-        case .waitingForCommand1,
-             .waitingForCommand2,
-             .waitingForSelection1,
-             .waitingForSelection2,
-             .NLSTextEntry,
-             .waitingForCommandAccept:
-            return
-        default:
-            return
-        }
+//        switch self.currentState {
+//        case .waitingForCommandAccept:
+//            // move to NLSTextEntry
+//            break
+//        case .waitingForSelection1:
+//            // mark selection
+//            // move to waitingForSelection2
+//            break
+//        case .waitingForSelection2:
+//            // mark selection
+//            // move to waitingForCommandAccept
+//            break
+//        case .NLSTextEntry:
+//            // commit the edit
+//            // move to waitingForCommand1
+//            break
+//        default:
+//            return
+//        }
     }
     
     override func mouseUp(with event: NSEvent) {
-        switch self.currentState {
+        switch self.currentState.phase {
         case .waitingForCommand1, .NLSTextEntry:
             self.clearSelectionHilite()
             
@@ -162,12 +198,27 @@ extension FDTextView {
                     if myRange.valid {
                         self.setSelectedRange(myRange.range)
                         self.drawSelectionHilite()
-                        self.setCurrentState(machineState.waitingForCommandAccept)
-                        cmdLine.stringValue = "Click anywhere to finish deletion"
-                    }else{
-                        return
+                            self.setCurrentState(machinePhase.waitingForCommandAccept)
+                            cmdLine.stringValue = "Click anywhere to finish deletion"
+                        
+                        
+                        }else{
+                            return
+                        }
+                case .text:
+                    self.clearSelectionHilite()
+                    
+                    let pointInView = self.convertPointFromWindow(event.locationInWindow)
+                    let clicked = self.characterIndexForInsertion(at: pointInView)
+                    let myRange = (valid: true, range: NSMakeRange(clicked, 1))
+                    if myRange.valid {
+                        self.setSelectedRange(myRange.range)
+                        self.drawSelectionHilite()
+                        self.setCurrentState(machinePhase.waitingForSelection2)
+                        cmdLine.stringValue = "Click to finish selection."
+                        
                     }
-                default:
+default:
                     return
                 }
             case .insert, .append:
@@ -177,7 +228,7 @@ extension FDTextView {
                 let clicked = self.characterIndexForInsertion(at: pointInView)
                 self.setSelectedRange(NSMakeRange(clicked, 0))
                 self.drawSelectionHilite()
-                self.setCurrentState(machineState.waitingForCommandAccept)
+                self.setCurrentState(machinePhase.waitingForCommandAccept)
                 cmdLine.stringValue = "Type to add text; click anywhere to finish."
             default:
                 return
@@ -186,7 +237,7 @@ extension FDTextView {
             switch self.currentVerb {
             case .delete, .insert:
                 self.cut(nil)
-                self.setState(state: machineState.NLSTextEntry)
+                self.setState(state: machinePhase.NLSTextEntry)
                 self.currentVerb = commandVerb.insert
                 self.currentNoun = commandNoun.text
                 cmdLine.stringValue = "\(currentVerb.rawValue) \(currentNoun.rawValue)"
@@ -204,7 +255,7 @@ extension FDTextView {
     
     override func keyDown(with event: NSEvent){
         self.clearSelectionHilite()
-        switch self.currentState {
+        switch self.currentState.phase {
         case .waitingForCommand1,
              .waitingForCommand2,
              .waitingForSelection1,
@@ -222,22 +273,22 @@ extension FDTextView {
         case "a","A":
             //drive state
             currentVerb =  .append
-            setCurrentState(machineState.waitingForCommand2)
+            setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.append.rawValue
         case "i","I":
             //drive state
             currentVerb = .insert
-            setCurrentState(machineState.waitingForCommand2)
+            setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.insert.rawValue
         case "d","D":
             //drive state
             currentVerb = commandVerb.delete
-            setCurrentState(machineState.waitingForCommand2)
+            setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.delete.rawValue
         case "r","R":
             //drive state
             currentVerb = commandVerb.replace
-            setCurrentState(machineState.waitingForCommand2)
+            setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.replace.rawValue
         default:
             super.keyUp(with: event)
@@ -249,27 +300,27 @@ extension FDTextView {
         case "t","T":
             //drive state
             currentNoun = commandNoun.text
-            setCurrentState(machineState.waitingForSelection1)
+            setCurrentState(machinePhase.waitingForSelection1)
             cmdLine.stringValue = "\(currentVerb.rawValue) Text: click to select insertion target"
         case "w","W":
             //drive state
             currentNoun = commandNoun.word
-            setCurrentState(machineState.waitingForSelection1)
+            setCurrentState(machinePhase.waitingForSelection1)
             cmdLine.stringValue = "\(currentVerb.rawValue) Word"
         case "i", "I":
             //drive state
             currentNoun = commandNoun.invisible
-            setCurrentState(machineState.waitingForSelection1)
+            setCurrentState(machinePhase.waitingForSelection1)
             cmdLine.stringValue = "\(currentVerb.rawValue) Invisible"
         case "v","V":
             //drive state
             currentNoun = commandNoun.visible
-            setCurrentState(machineState.waitingForSelection1)
+            setCurrentState(machinePhase.waitingForSelection1)
             cmdLine.stringValue = "\(currentVerb.rawValue) Visible"
         case "s","S":
             //drive state
             currentNoun = commandNoun.sentence
-            setCurrentState(machineState.waitingForSelection1)
+            setCurrentState(machinePhase.waitingForSelection1)
             cmdLine.stringValue = "\(currentVerb.rawValue) Sentence"
         default:
             super.keyUp(with: event)
@@ -284,7 +335,7 @@ extension FDTextView {
             if chStr == bsChar
             {
                 if event.modifierFlags.contains(.command) {
-                    switch self.currentState {
+                    switch self.currentState.phase {
                     case .waitingForCommand1:
                         restoreStateFromBreadcrumbs()
                         return
@@ -307,7 +358,7 @@ extension FDTextView {
             }
         }
 /*SWITCH ON MACHINE STATE; */
-        switch self.currentState {
+        switch self.currentState.phase {
         case .waitingForCommand1:
             trapCmd1Chars(event)
             

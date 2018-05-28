@@ -27,7 +27,7 @@ class FDViewController: NSViewController, NSTextViewDelegate {
         
         // Do any additional setup after loading the view.
          
-        textView!.setState(state: FDTextView.machineState.waitingForCommand1)
+        textView!.setPhase(phase: FDTextView.machinePhase.waitingForCommand1)
     }
     
     override var representedObject: Any? {

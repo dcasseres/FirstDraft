@@ -1,6 +1,4 @@
-
-//
-//  FDTextView.swift
+// FDTextView.swift
 //  FIrstDraft
 //
 //  Created by David Casseres on 12/18/17.
@@ -75,14 +73,13 @@ enum machinePhase: String {
     
     
     var currentState = machineState.init()
-    var currentVerb: commandVerb = commandVerb.append
-    var currentNoun: commandNoun = commandNoun.text
     
-    var breadcrumbState = machinePhase.NLSTextEntry
+    var breadcrumbState = machineState.init()
     var breadcrumbVerb: commandVerb = commandVerb.append
     var breadcrumbNoun: commandNoun = commandNoun.text
 
     @IBOutlet weak var cmdLine:NSTextField!
+    @IBOutlet weak var phasePeek:NSTextField!
     
     func setState(state:machinePhase)  {
         currentState.phase = state
@@ -90,39 +87,38 @@ enum machinePhase: String {
         case machinePhase.waitingForCommand1:
             cmdLine.stringValue = "Type the initials of a command "
         case machinePhase.NLSTextEntry:
-            currentVerb = commandVerb.append
-            currentNoun = commandNoun.text
+            currentState.verb = commandVerb.append
+            currentState.noun = commandNoun.text
         default: break
         }
         setBreadcrumbs()
+        phasePeek.stringValue = state.rawValue
     }
     
     func setPhase (phase: machinePhase){
         currentState.phase = phase
-    }
+        setBreadcrumbs()
+        phasePeek.stringValue = phase.rawValue
+}
     
     func setBreadcrumbs() {
-        breadcrumbState = currentState.phase
-        breadcrumbNoun = currentNoun
-        breadcrumbVerb = currentVerb
+        breadcrumbState = currentState
     }
     
     func restoreStateFromBreadcrumbs() {
-        currentState.phase = breadcrumbState
-        currentVerb = breadcrumbVerb
-        currentNoun
-            = breadcrumbNoun
-    }
+        currentState = breadcrumbState
+        phasePeek.stringValue = currentState.phase.rawValue
+}
     
     @objc func modalAction(_ sender:Any?){
         switch currentState.phase {
         case machinePhase.waitingForCommand1:
-            setState(state: .waitingForCommand1)
+            setPhase(phase: .waitingForCommand1)
         default:
-            setState(state: .waitingForCommand1)
+            setPhase(phase: .waitingForCommand1)
         }
-        currentVerb = .noVerb
-        currentNoun = .noNoun
+        currentState.verb = .noVerb
+        currentState.noun = .noNoun
     }
 }
 
@@ -137,7 +133,8 @@ extension FDTextView {
 //        }
 
         currentState.phase = newState
-    }
+        phasePeek.stringValue = newState.rawValue
+}
     
     
     func convertPointFromWindow(_ pt: NSPoint) -> NSPoint {
@@ -170,24 +167,22 @@ extension FDTextView {
     
     override func mouseUp(with event: NSEvent) {
         switch self.currentState.phase {
-        case .waitingForCommand1, .NLSTextEntry:
+        case .waitingForCommand1:
             self.clearSelectionHilite()
-            
             let pointInView = self.convertPointFromWindow(event.locationInWindow)
             let clicked = self.characterIndexForInsertion(at: pointInView)
             self.setSelectedRange(NSMakeRange(clicked, 0))
             self.drawSelectionHilite()
         case .waitingForSelection1:
-            switch self.currentVerb {
+            switch self.currentState.verb {
             case .delete:
-                switch self.currentNoun {
+                switch self.currentState.noun {
                 case .word, .visible, .invisible:
                     self.clearSelectionHilite()
-                    
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
                     var myRange = (valid: false, range: NSMakeRange(0, 0))
-                    switch self.currentNoun {
+                    switch self.currentState.noun {
                     case .word:
                         myRange = self.rangeForCharTypeAt(typeCheck: isAlphanumeric(_:), clicked)
                     case .invisible:
@@ -207,7 +202,6 @@ extension FDTextView {
                         }
                 case .text:
                     self.clearSelectionHilite()
-                    
                     let pointInView = self.convertPointFromWindow(event.locationInWindow)
                     let clicked = self.characterIndexForInsertion(at: pointInView)
                     let myRange = (valid: true, range: NSMakeRange(clicked, 1))
@@ -218,12 +212,11 @@ extension FDTextView {
                         cmdLine.stringValue = "Click to finish selection."
                         
                     }
-default:
+                default:
                     return
                 }
             case .insert, .append:
                 self.clearSelectionHilite()
-                
                 let pointInView = self.convertPointFromWindow(event.locationInWindow)
                 let clicked = self.characterIndexForInsertion(at: pointInView)
                 self.setSelectedRange(NSMakeRange(clicked, 0))
@@ -233,14 +226,20 @@ default:
             default:
                 return
             }
+        case .NLSTextEntry:
+            self.clearSelectionHilite()
+            let pointInView = self.convertPointFromWindow(event.locationInWindow)
+            let clicked = self.characterIndexForInsertion(at: pointInView)
+            self.setSelectedRange(NSMakeRange(clicked, 0))
+            self.drawSelectionHilite()
         case .waitingForCommandAccept:
-            switch self.currentVerb {
+            switch self.currentState.verb {
             case .delete, .insert:
                 self.cut(nil)
-                self.setState(state: machinePhase.NLSTextEntry)
-                self.currentVerb = commandVerb.insert
-                self.currentNoun = commandNoun.text
-                cmdLine.stringValue = "\(currentVerb.rawValue) \(currentNoun.rawValue)"
+                self.setPhase(phase: machinePhase.NLSTextEntry)
+                self.currentState.verb = commandVerb.insert
+                self.currentState.noun = commandNoun.text
+                cmdLine.stringValue = "\(currentState.verb.rawValue) \(currentState.noun.rawValue)"
                 self.clearSelectionHilite()
                 let insertionPoint = self.selectedRange().location + self.selectedRange().length
                 self.setSelectedRange(NSMakeRange(insertionPoint, 0))
@@ -272,22 +271,22 @@ default:
         switch event.charactersIgnoringModifiers!.first!{
         case "a","A":
             //drive state
-            currentVerb =  .append
+            currentState.verb =  .append
             setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.append.rawValue
         case "i","I":
             //drive state
-            currentVerb = .insert
+            currentState.verb = .insert
             setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.insert.rawValue
         case "d","D":
             //drive state
-            currentVerb = commandVerb.delete
+            currentState.verb = commandVerb.delete
             setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.delete.rawValue
         case "r","R":
             //drive state
-            currentVerb = commandVerb.replace
+            currentState.verb = commandVerb.replace
             setCurrentState(machinePhase.waitingForCommand2)
             cmdLine.stringValue = commandVerb.replace.rawValue
         default:
@@ -299,29 +298,29 @@ default:
         switch event.charactersIgnoringModifiers!.first!{
         case "t","T":
             //drive state
-            currentNoun = commandNoun.text
+            currentState.noun = commandNoun.text
             setCurrentState(machinePhase.waitingForSelection1)
-            cmdLine.stringValue = "\(currentVerb.rawValue) Text: click to select insertion target"
+            cmdLine.stringValue = "\(currentState.verb.rawValue) Text: click to select insertion target"
         case "w","W":
             //drive state
-            currentNoun = commandNoun.word
+            currentState.noun = commandNoun.word
             setCurrentState(machinePhase.waitingForSelection1)
-            cmdLine.stringValue = "\(currentVerb.rawValue) Word"
+            cmdLine.stringValue = "\(currentState.verb.rawValue) Word"
         case "i", "I":
             //drive state
-            currentNoun = commandNoun.invisible
+            currentState.noun = commandNoun.invisible
             setCurrentState(machinePhase.waitingForSelection1)
-            cmdLine.stringValue = "\(currentVerb.rawValue) Invisible"
+            cmdLine.stringValue = "\(currentState.verb.rawValue) Invisible"
         case "v","V":
             //drive state
-            currentNoun = commandNoun.visible
+            currentState.noun = commandNoun.visible
             setCurrentState(machinePhase.waitingForSelection1)
-            cmdLine.stringValue = "\(currentVerb.rawValue) Visible"
+            cmdLine.stringValue = "\(currentState.verb.rawValue) Visible"
         case "s","S":
             //drive state
-            currentNoun = commandNoun.sentence
+            currentState.noun = commandNoun.sentence
             setCurrentState(machinePhase.waitingForSelection1)
-            cmdLine.stringValue = "\(currentVerb.rawValue) Sentence"
+            cmdLine.stringValue = "\(currentState.verb.rawValue) Sentence"
         default:
             super.keyUp(with: event)
         }

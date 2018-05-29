@@ -725,12 +725,16 @@
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <connections>
                                                 <outlet property="cmdLine" destination="U9g-uq-LL6" id="3Dy-zW-hvs"/>
-                                                <outlet property="delegate" destination="XfG-lQ-9wD" id="Asd-JM-7jX"/>
+                                                <outlet property="delegate" destination="ZUc-3S-Iw5" id="Y2a-CD-rhh"/>
+                                                <outlet property="phasePeek" destination="RxC-pV-0S2" id="QfU-Ul-9Xs"/>
                                             </connections>
                                         </textView>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="450" id="ft9-xO-e6B"/>
+                                </constraints>
                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="KLP-eP-dk9">
                                     <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                                     <autoresizingMask key="autoresizingMask"/>
@@ -751,6 +755,18 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RxC-pV-0S2" userLabel="PhasePeek">
+                                <rect key="frame" x="18" y="0.0" width="253" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="phase" id="ZUc-3S-Iw5">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    <connections>
+                                        <action selector="performFindPanelAction:" target="CKV-KC-SXd" id="Mrb-PA-OMu"/>
+                                    </connections>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="JTL-t0-tDs" secondAttribute="bottom" constant="-5" id="FRu-ga-Uem"/>
@@ -763,6 +779,7 @@
                         </constraints>
                     </customView>
                     <connections>
+                        <outlet property="eek" destination="RxC-pV-0S2" id="65Z-xF-alV"/>
                         <outlet property="textView" destination="CKV-KC-SXd" id="PX7-pJ-Zh0"/>
                     </connections>
                 </viewController>

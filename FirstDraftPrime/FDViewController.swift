@@ -14,6 +14,8 @@ import Cocoa
 class FDViewController: NSViewController, NSTextViewDelegate {
     
     @IBOutlet var textView: FDTextView?
+    @IBOutlet var phasePeek: FDTextView?
+    @IBOutlet weak var eek: NSTextField!
     
     let TSTSTR = "A quick brown fox jumps over the lazy dog."
     
